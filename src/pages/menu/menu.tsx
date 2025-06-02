@@ -1,6 +1,6 @@
 import { Component, onMount } from 'solid-js';
 import { Button, Typography } from '@suid/material';
-import { setCurrentRoute } from '../../state/route-state';
+import { setCurrentRoute, getBasePath } from '../../state/route-state';
 import { Route } from '../../types/routes';
 import { audioManager } from '../../state/audio-state';
 import styles from './menu.module.scss';
@@ -27,8 +27,8 @@ const Menu: Component = () => {
                 loop
                 playsinline
                 disablepictureinpicture>
-                <source src="/videos/menu.mp4" type="video/mp4" />
-                <source src="/videos/menu.webm" type="video/webm" />
+                <source src={`${getBasePath()}videos/menu.mp4`} type="video/mp4" />
+                <source src={`${getBasePath()}videos/menu.webm`} type="video/webm" />
             </video>
             <div class={styles.overlay}>
                 <Typography variant='h1' class={styles.title}>
