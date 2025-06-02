@@ -3,7 +3,7 @@ import styles from './end-screen.module.scss';
 import { Typography, Button } from '@suid/material';
 import { score, highScore } from '../../state/game-states';
 import { Route } from '../../types/routes';
-import { setCurrentRoute } from '../../state/route-state';
+import { setCurrentRoute, getBasePath } from '../../state/route-state';
 import AudioControls from '../../components/audio-controls/audio-controls';
 import { audioManager } from '../../state/audio-state';
 
@@ -13,7 +13,7 @@ const EndScreen: Component = () => {
     });
 
     return (
-        <div class={styles.container}>
+        <div class={styles.container} style={{ 'background-image': `url(${getBasePath()}images/endscreen.png)` }}>
             <div class={styles.content}>
                 <Typography variant="h2" class={styles.title}>
                     {score() >= highScore() ? 'WELL DONE!' : 'GAME OVER'}
