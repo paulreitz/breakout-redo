@@ -1,10 +1,12 @@
 import Phaser from 'phaser';
+import { Subject, fromEvent } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { createActor } from 'xstate';
 import { setGameLoading } from '../../state/loading-screens';
 import { audioManager } from '../../state/audio-state';
 import { gameStateMachine } from '../system/game-state';
 import { GameSceneInterface } from './game-scene-interface';
-import { level, setLevel, lives, setLives, increaseScore } from '../../state/game-states';
+import { level, setLevel, lives, setLives, increaseScore, setPaused } from '../../state/game-states';
 import { Route } from '../../types/routes';
 import { setCurrentRoute } from '../../state/route-state';
 
@@ -26,6 +28,8 @@ export default class GameScene extends Phaser.Scene implements GameSceneInterfac
     public paddle: Phaser.Physics.Arcade.Sprite;
     public ball: Phaser.Physics.Arcade.Sprite | undefined;
     public blocksGroup: Phaser.Physics.Arcade.Group;
+
+    private destroy$ = new Subject<void>();
 
     init(): void {
         this.boardBuilder = new BoardBuilder(this, {
@@ -76,7 +80,20 @@ export default class GameScene extends Phaser.Scene implements GameSceneInterfac
                 audioManager.stopMusic();
                 setCurrentRoute(Route.EndScreen);
             }, 1000);
-        })
+        });
+        fromEvent<KeyboardEvent>(window, 'keyup')
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((event) => {
+                if (event.key === 'Escape' || event.key === 'p') {
+                    if (this.game.isPaused) {
+                        this.game.resume();
+                    } else {
+                        this.game.pause();
+                    }
+                    console.log(`Game paused: ${this.game.isPaused}`);
+                    setPaused(this.game.isPaused);
+                }
+            });
         this.gameStateActor.start();
     }
 
@@ -116,6 +133,8 @@ export default class GameScene extends Phaser.Scene implements GameSceneInterfac
     shutdown(): void {
         this.gameStateActor.stop();
         this.boardBuilder.reset();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     public addBlockToGroup(block: Phaser.Physics.Arcade.Sprite): void {

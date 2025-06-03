@@ -17,3 +17,16 @@
     width: 100%;
     height: 100%;
 }
+
+.pausedOverlay {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pausedText {
+    color: white;
+    font-weight: 700;;
+}
